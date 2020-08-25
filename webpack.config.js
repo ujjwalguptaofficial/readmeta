@@ -2,6 +2,9 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const nodemonPlugin = require('nodemon-webpack-plugin');
 const webpack = require('webpack')
+const {
+    banner
+} = require('./license');
 module.exports = {
     entry: [
         path.resolve(__dirname, 'src/index.ts')
@@ -43,8 +46,12 @@ module.exports = {
     plugins: [
         new nodemonPlugin(),
         new webpack.BannerPlugin({
+            banner: banner,
+        }),
+        new webpack.BannerPlugin({
             banner: "#!/usr/bin/env node",
             raw: true
-        }),],
+        }),
+    ],
     externals: [nodeExternals()]
 };

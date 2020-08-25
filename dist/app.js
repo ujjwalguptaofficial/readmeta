@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/*!
+ * @license :getmeta - V1.0.0 - 26/08/2020
+ * https://github.com/ujjwalguptaofficial/getmeta
+ * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
+ */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,93 +87,25 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
-/*!****************************!*\
-  !*** external "puppeteer" ***!
-  \****************************/
-/*! no static exports found */
-/*! exports used: default */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
+/******/ ({
 
-module.exports = require("puppeteer");
-
-/***/ }),
-/* 1 */
-/*!******************************!*\
-  !*** external "cli-spinner" ***!
-  \******************************/
-/*! no static exports found */
-/*! exports used: Spinner */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-module.exports = require("cli-spinner");
-
-/***/ }),
-/* 2 */
-/*!****************************!*\
-  !*** multi ./src/index.ts ***!
-  \****************************/
-/*! no static exports found */
-/*! all exports used */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! /home/warrior/projects/opensource/getmeta/src/index.ts */5);
-
-
-/***/ }),
-/* 3 */
-/*!****************************************!*\
-  !*** external "pending-xhr-puppeteer" ***!
-  \****************************************/
-/*! no static exports found */
-/*! all exports used */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-module.exports = require("pending-xhr-puppeteer");
-
-/***/ }),
-/* 4 */
-/*!****************************!*\
-  !*** external "commander" ***!
-  \****************************/
-/*! no static exports found */
-/*! all exports used */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-module.exports = require("commander");
-
-/***/ }),
-/* 5 */
-/*!**********************************!*\
-  !*** ./src/index.ts + 1 modules ***!
-  \**********************************/
-/*! no exports provided */
-/*! all exports used */
-/*! ModuleConcatenation bailout: Cannot concat with external "cli-spinner" (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with external "puppeteer" (<- Module is not an ECMAScript module) */
+/***/ "./src/fetch_meta.ts":
+/*!***************************!*\
+  !*** ./src/fetch_meta.ts ***!
+  \***************************/
+/*! exports provided: fetchMeta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-
-// EXTERNAL MODULE: external "puppeteer"
-var external_puppeteer_ = __webpack_require__(0);
-var external_puppeteer_default = /*#__PURE__*/__webpack_require__.n(external_puppeteer_);
-
-// EXTERNAL MODULE: external "cli-spinner"
-var external_cli_spinner_ = __webpack_require__(1);
-
-// CONCATENATED MODULE: ./src/fetch_meta.ts
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchMeta", function() { return fetchMeta; });
+/* harmony import */ var puppeteer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! puppeteer */ "puppeteer");
+/* harmony import */ var puppeteer__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(puppeteer__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var cli_spinner__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! cli-spinner */ "cli-spinner");
+/* harmony import */ var cli_spinner__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cli_spinner__WEBPACK_IMPORTED_MODULE_1__);
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -206,14 +143,14 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
     }
 };
 
-var PendingXHR = __webpack_require__(/*! pending-xhr-puppeteer */ 3).PendingXHR;
+var PendingXHR = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer").PendingXHR;
 
 var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, function () {
     var spinner, prefix, browser, page, pendingXHR, result, key, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                spinner = new external_cli_spinner_["Spinner"]("Fetching.. %s");
+                spinner = new cli_spinner__WEBPACK_IMPORTED_MODULE_1__["Spinner"]("Fetching.. %s");
                 // spinner. spinnerInstance = new Spinner(`${text}.. %s`);
                 spinner.setSpinnerString(18);
                 spinner.start();
@@ -224,7 +161,7 @@ var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, functi
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 9, , 10]);
-                return [4 /*yield*/, external_puppeteer_default.a.launch({
+                return [4 /*yield*/, puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
                     // headless: false
                     })];
             case 2:
@@ -282,7 +219,7 @@ var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, functi
                 console.log("\n    \n    ");
                 for (key in result) {
                     if (result[key]) {
-                        console.log(key + " is \"" + result[key] + "\"");
+                        console.log(key + " : \"" + result[key] + "\"");
                         console.log("");
                     }
                 }
@@ -302,18 +239,87 @@ var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, functi
     });
 }); };
 
-// CONCATENATED MODULE: ./src/index.ts
 
-var Command = __webpack_require__(/*! commander */ 4).Command;
+/***/ }),
+
+/***/ "./src/index.ts":
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _fetch_meta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./fetch_meta */ "./src/fetch_meta.ts");
+
+var Command = __webpack_require__(/*! commander */ "commander").Command;
 var program = new Command();
 program
     .option('-url, --url <value>', 'absolute url of website');
 program.parse(process.argv);
 if (program.url) {
-    fetchMeta(program.url);
+    Object(_fetch_meta__WEBPACK_IMPORTED_MODULE_0__["fetchMeta"])(program.url);
 }
 
 
+/***/ }),
+
+/***/ 0:
+/*!****************************!*\
+  !*** multi ./src/index.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! /home/warrior/projects/opensource/getmeta/src/index.ts */"./src/index.ts");
+
+
+/***/ }),
+
+/***/ "cli-spinner":
+/*!******************************!*\
+  !*** external "cli-spinner" ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("cli-spinner");
+
+/***/ }),
+
+/***/ "commander":
+/*!****************************!*\
+  !*** external "commander" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("commander");
+
+/***/ }),
+
+/***/ "pending-xhr-puppeteer":
+/*!****************************************!*\
+  !*** external "pending-xhr-puppeteer" ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("pending-xhr-puppeteer");
+
+/***/ }),
+
+/***/ "puppeteer":
+/*!****************************!*\
+  !*** external "puppeteer" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("puppeteer");
+
 /***/ })
-/******/ ]);
+
+/******/ });
 //# sourceMappingURL=app.js.map

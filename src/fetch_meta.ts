@@ -62,7 +62,7 @@ export const fetchMeta = async (url: string) => {
     `);
         for (const key in result) {
             if (result[key]) {
-                console.log(`${key} is "${result[key]}"`);
+                console.log(`${key} : "${result[key]}"`);
                 console.log("");
             }
         }

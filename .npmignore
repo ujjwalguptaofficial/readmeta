@@ -1,0 +1,17 @@
+examples
+logos
+node_modules
+src
+test
+webpack
+build
+output
+
+#build tools
+.travis.yml
+.vscode
+
+#definition
+!dist/src
+
+*.tgz
