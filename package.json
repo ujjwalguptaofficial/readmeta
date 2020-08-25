@@ -10,11 +10,11 @@
     "build": "webpack",
     "buildpack": "npm run deploy && npm pack",
     "deploy": "NODE_ENV=production npm run build",
-    "build:install": "npm run buildpack && sudo npm i getmeta-1.0.0.tgz -g"
+    "build:install": "npm run buildpack && sudo npm i readmeta-1.0.0.tgz -g"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ujjwalguptaofficial/getmeta.git"
+    "url": "git+https://github.com/ujjwalguptaofficial/readmeta.git"
   },
   "keywords": [
     "meta",
@@ -26,9 +26,9 @@
   "author": "ujjwal gupta",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ujjwalguptaofficial/getmeta/issues"
+    "url": "https://github.com/ujjwalguptaofficial/readmeta/issues"
   },
-  "homepage": "https://github.com/ujjwalguptaofficial/getmeta#readme",
+  "homepage": "https://github.com/ujjwalguptaofficial/readmeta#readme",
   "dependencies": {
     "bufferutil": "^4.0.1",
     "cli-spinner": "^0.2.10",
