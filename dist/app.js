@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :getmeta - V1.0.0 - 26/08/2020
+ * @license :readmeta - V1.0.0 - 26/08/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */

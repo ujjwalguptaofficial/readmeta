@@ -1,10 +1,10 @@
 {
-  "name": "getmeta",
+  "name": "readmeta",
   "version": "1.0.0",
   "description": "meta tag previewer for web application",
   "main": "./dist/app.js",
   "bin": {
-    "getmeta": "./dist/app.js"
+    "readmeta": "./dist/app.js"
   },
   "scripts": {
     "build": "webpack",
