@@ -1,13 +1,16 @@
 {
   "name": "getmeta",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "meta tag previewer for web application",
+  "main": "./dist/app.js",
+  "bin": {
+    "getmeta": "./dist/app.js"
+  },
   "scripts": {
     "build": "webpack",
     "buildpack": "npm run deploy && npm pack",
     "deploy": "NODE_ENV=production npm run build",
-    "build:install": "npm run buildpack && sudo npm i fort-creator-1.2.1.tgz -g"
+    "build:install": "npm run buildpack && sudo npm i getmeta-1.0.0.tgz -g"
   },
   "repository": {
     "type": "git",
@@ -17,7 +20,8 @@
     "meta",
     "preview",
     "spa",
-    "render"
+    "render",
+    "cli"
   ],
   "author": "ujjwal gupta",
   "license": "MIT",
@@ -26,9 +30,12 @@
   },
   "homepage": "https://github.com/ujjwalguptaofficial/getmeta#readme",
   "dependencies": {
+    "bufferutil": "^4.0.1",
+    "cli-spinner": "^0.2.10",
     "commander": "^6.0.0",
     "pending-xhr-puppeteer": "^2.3.2",
-    "puppeteer": "^5.2.1"
+    "puppeteer": "^5.2.1",
+    "utf-8-validate": "^5.0.2"
   },
   "devDependencies": {
     "nodemon-webpack-plugin": "^4.3.2",

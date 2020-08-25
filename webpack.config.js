@@ -1,6 +1,7 @@
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
-const nodemonPlugin = require('nodemon-webpack-plugin')
+const nodemonPlugin = require('nodemon-webpack-plugin');
+const webpack = require('webpack')
 module.exports = {
     entry: [
         path.resolve(__dirname, 'src/index.ts')
@@ -36,9 +37,14 @@ module.exports = {
     },
     output: {
         filename: 'app.js',
-        path: path.resolve(__dirname, process.env.BUILD_FOLDER || 'bin'),
+        path: path.resolve(__dirname, process.env.BUILD_FOLDER || 'dist'),
         pathinfo: true
     },
-    plugins: [new nodemonPlugin()],
+    plugins: [
+        new nodemonPlugin(),
+        new webpack.BannerPlugin({
+            banner: "#!/usr/bin/env node",
+            raw: true
+        }),],
     externals: [nodeExternals()]
 };
