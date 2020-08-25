@@ -8,6 +8,14 @@ npm i metatag -g
 
 **Note:** - You might get permission issue while installing this package. In this case please run command as sudo or with admin priviledge.
 
+### Still not working
+
+try this
+
+```
+sudo npm i getmeta -g --unsafe-perm=true
+```
+
 # Example 
 
 * metatag --url=google.com
