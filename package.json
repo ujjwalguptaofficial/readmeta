@@ -1,6 +1,6 @@
 {
   "name": "readmeta",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "meta tag previewer for web application",
   "main": "./dist/app.js",
   "bin": {

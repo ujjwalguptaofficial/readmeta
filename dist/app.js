@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :readmeta - V1.0.0 - 26/08/2020
+ * @license :readmeta - V1.0.1 - 26/08/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */
@@ -272,7 +272,7 @@ if (program.url) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/warrior/projects/opensource/getmeta/src/index.ts */"./src/index.ts");
+module.exports = __webpack_require__(/*! /home/warrior/projects/opensource/readmeta/src/index.ts */"./src/index.ts");
 
 
 /***/ }),
