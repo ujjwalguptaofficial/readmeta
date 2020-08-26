@@ -146,7 +146,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 var PendingXHR = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer").PendingXHR;
 
 var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, function () {
-    var spinner, prefix, browser, page, pendingXHR, result, key, error_1;
+    var spinner, prefix, browser, page, pendingXHR, result, print_1, category, categoryContent, meta, metaContent, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -185,42 +185,71 @@ var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, functi
                 _a.sent();
                 return [4 /*yield*/, page.evaluate(function () {
                         var head = document.head;
+                        var title = document.querySelector("title");
                         var description = head.querySelector('meta[name=description]');
+                        var keywords = head.querySelector('meta[property=keywords]');
+                        var ogTitle = head.querySelector('meta[property="og:title"]');
+                        var ogDescription = head.querySelector('meta[property="og:description"]');
+                        var ogSiteName = head.querySelector('meta[property="og:site_name"]');
                         var ogImage = head.querySelector('meta[property="og:image"]');
                         var ogImageWidth = head.querySelector('meta[property="og:image:width"]');
                         var ogImageHeight = head.querySelector('meta[property="og:image:height"]');
-                        var ogTitle = head.querySelector('meta[property="og:title"]');
-                        var ogDescription = head.querySelector('meta[property="og:description"]');
                         var ogType = head.querySelector('meta[property="og:type"]');
+                        var ogUrl = head.querySelector('meta[property="og:url"]');
+                        var fbAppId = head.querySelector('meta[property="fb:app_id"]');
                         var twitterSite = head.querySelector('meta[name="twitter:site"]');
                         var twitterTitle = head.querySelector('meta[name="twitter:title"]');
                         var twitterDescription = head.querySelector('meta[name="twitter:description"]');
                         var twitterImage = head.querySelector('meta[name="twitter:image"]');
                         var twitterCard = head.querySelector('meta[name="twitter:card"]');
+                        var twitterImageAlt = head.querySelector('meta[name="twitter:image:alt"]');
                         return {
-                            title: head.getElementsByTagName('title')[0].innerText,
-                            descripton: description ? description.content : null,
-                            ogTitle: ogTitle ? ogTitle.content : null,
-                            ogDescription: ogDescription ? ogDescription.content : null,
-                            ogImage: ogImage ? ogImage.content : null,
-                            ogImageWidth: ogImageWidth ? ogImageWidth.content : null,
-                            ogImageHeight: ogImageHeight ? ogImageHeight.content : null,
-                            ogType: ogType ? ogType.content : null,
-                            twitterSite: twitterSite ? twitterSite.content : null,
-                            twitterTitle: twitterTitle ? twitterTitle.content : null,
-                            twitterDescription: twitterDescription ? twitterDescription.content : null,
-                            twitterImage: twitterImage ? twitterImage.content : null,
-                            twitterCard: twitterCard ? twitterCard.content : null,
+                            general: {
+                                title: title ? title.innerText : null,
+                                descripton: description ? description.content : null,
+                                keywords: keywords ? keywords.content : null,
+                            },
+                            facebook: {
+                                "og:title": ogTitle ? ogTitle.content : null,
+                                "og:description": ogDescription ? ogDescription.content : null,
+                                "og:site_name": ogSiteName ? ogSiteName.content : null,
+                                "og:image": ogImage ? ogImage.content : null,
+                                "og:image:width": ogImageWidth ? ogImageWidth.content : null,
+                                "og:image:height": ogImageHeight ? ogImageHeight.content : null,
+                                "og:type": ogType ? ogType.content : null,
+                                "og:url": ogUrl ? ogUrl.content : null,
+                                "fb:app_id": fbAppId ? fbAppId.content : null,
+                            },
+                            twitter: {
+                                "twitter:site": twitterSite ? twitterSite.content : null,
+                                "twitter:title": twitterTitle ? twitterTitle.content : null,
+                                "twitter:description": twitterDescription ? twitterDescription.content : null,
+                                "twitter:image": twitterImage ? twitterImage.content : null,
+                                "twitter:card": twitterCard ? twitterCard.content : null,
+                                "twitter:image:alt": twitterImageAlt ? twitterImageAlt.content : null,
+                            }
                         };
                     })];
             case 7:
                 result = _a.sent();
                 spinner.stop();
                 console.log("\n    \n    ");
-                for (key in result) {
-                    if (result[key]) {
-                        console.log(key + " : \"" + result[key] + "\"");
-                        console.log("");
+                print_1 = function (message) {
+                    console.log(message);
+                };
+                for (category in result) {
+                    categoryContent = result[category];
+                    if (Object.keys(categoryContent).length == 0) {
+                        return [2 /*return*/];
+                    }
+                    console.log("--------------------------" + category + "------------------------------");
+                    console.log("");
+                    for (meta in categoryContent) {
+                        metaContent = categoryContent[meta];
+                        if (metaContent) {
+                            console.log(meta + " : \"" + metaContent + "\"");
+                            console.log("");
+                        }
                     }
                 }
                 return [4 /*yield*/, browser.close()];
@@ -233,6 +262,7 @@ var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, functi
                 console.error("some error occured");
                 console.error("Error message is", error_1.message);
                 console.info("please contact author of this Project");
+                process.exit();
                 return [3 /*break*/, 10];
             case 10: return [2 /*return*/];
         }
