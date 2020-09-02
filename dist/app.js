@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :readmeta - V1.0.2 - 26/08/2020
+ * @license :readmeta - V1.0.2 - 02/09/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */
@@ -92,6 +92,100 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/change_img.ts":
+/*!***************************!*\
+  !*** ./src/change_img.ts ***!
+  \***************************/
+/*! exports provided: changeImageSize, crop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "changeImageSize", function() { return changeImageSize; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return crop; });
+// import { getImgExtensionFromUrl } from "./get_extension_from_url";
+const changeImageSize = async function (dataUrl, width, height, quality = 1 // e.g. 0.9 = 90% quality
+) {
+    const getImgExtensionFromUrl = (url) => {
+        const extension = ["jpg", "jpeg", "png", "svg", "webp"];
+        return extension.find(q => url.includes(q));
+    };
+    function getImage(dataUrl) {
+        return new Promise((resolve, reject) => {
+            // add current data for caching issue
+            // if (dataUrl.includes('http')) {
+            //     dataUrl = addParameterToURL(dataUrl, 'cors', Date.now());
+            // }
+            const image = new Image();
+            image.src = dataUrl;
+            image.crossOrigin = "true";
+            image.onload = () => {
+                resolve(image);
+            };
+            // image.onerror = (el: any, err: ErrorEvent) => {
+            //     reject(err.error);
+            // };
+        });
+    }
+    // Create a temporary image so that we can compute the height of the image.
+    const image = await getImage(dataUrl);
+    const imageType = `image/${getImgExtensionFromUrl(dataUrl)}`;
+    // Create a temporary canvas to draw the downscaled image on.
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    // Draw the downscaled image on the canvas and return the new data URL.
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0, width, height);
+    const newDataUrl = canvas.toDataURL(imageType, quality);
+    return newDataUrl;
+};
+const crop = function (url, aspectRatio) {
+    // we return a Promise that gets resolved with our canvas element
+    return new Promise(resolve => {
+        debugger;
+        // this image will hold our source image data
+        const inputImage = new Image();
+        // we want to wait for our image to load
+        inputImage.onload = () => {
+            debugger;
+            // let's store the width and height of our image
+            const inputWidth = inputImage.naturalWidth;
+            const inputHeight = inputImage.naturalHeight;
+            // get the aspect ratio of the input image
+            const inputImageAspectRatio = inputWidth / inputHeight;
+            // if it's bigger than our target aspect ratio
+            let outputWidth = inputWidth;
+            let outputHeight = inputHeight;
+            if (inputImageAspectRatio > aspectRatio) {
+                outputWidth = inputHeight * aspectRatio;
+            }
+            else if (inputImageAspectRatio < aspectRatio) {
+                outputHeight = inputWidth / aspectRatio;
+            }
+            // calculate the position to draw the image at
+            const outputX = (outputWidth - inputWidth) * .5;
+            const outputY = (outputHeight - inputHeight) * .5;
+            // create a canvas that will present the output image
+            const outputImage = document.createElement('canvas');
+            // set it to the same size as the image
+            outputImage.width = outputWidth;
+            outputImage.height = outputHeight;
+            // draw our image at position 0, 0 on the canvas
+            const ctx = outputImage.getContext('2d');
+            ctx.drawImage(inputImage, outputX, outputY);
+            document.body.appendChild(outputImage);
+            // resolve(outputImage);
+            resolve(outputImage.toDataURL("image/png"));
+        };
+        // start loading our image
+        inputImage.src = url;
+    });
+};
+
+
+/***/ }),
+
 /***/ "./src/fetch_meta.ts":
 /*!***************************!*\
   !*** ./src/fetch_meta.ts ***!
@@ -106,168 +200,127 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var puppeteer__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(puppeteer__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var cli_spinner__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! cli-spinner */ "cli-spinner");
 /* harmony import */ var cli_spinner__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cli_spinner__WEBPACK_IMPORTED_MODULE_1__);
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+/* harmony import */ var _print_tag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./print_tag */ "./src/print_tag.ts");
+/* harmony import */ var _change_img__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./change_img */ "./src/change_img.ts");
+
+const { PendingXHR } = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer");
+
+
+
+const fetchMeta = async (url, shouldPreview) => {
+    const spinner = new cli_spinner__WEBPACK_IMPORTED_MODULE_1__["Spinner"](`Fetching.. %s`);
+    // spinner. spinnerInstance = new Spinner(`${text}.. %s`);
+    spinner.setSpinnerString(18);
+    spinner.start();
+    var prefix = 'http://';
+    if (url.indexOf("http") < 0) {
+        url = prefix + url;
+    }
+    try {
+        const browser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
+            headless: !shouldPreview,
+            devtools: true
+        });
+        let page = await browser.newPage();
+        const pendingXHR = new PendingXHR(page);
+        await page.goto(url);
+        // await page.waitForNavigation({ waitUntil: "networkidle0" });
+        await pendingXHR.waitForAllXhrFinished();
+        await new Promise((res) => {
+            setTimeout(res, 2000);
+        });
+        const result = await page.evaluate(() => {
+            const head = document.head;
+            const title = document.querySelector("title");
+            const description = head.querySelector('meta[name=description]');
+            const keywords = head.querySelector('meta[property=keywords]');
+            const ogTitle = head.querySelector('meta[property="og:title"]');
+            const ogDescription = head.querySelector('meta[property="og:description"]');
+            const ogSiteName = head.querySelector('meta[property="og:site_name"]');
+            const ogImage = head.querySelector('meta[property="og:image"]');
+            const ogImageWidth = head.querySelector('meta[property="og:image:width"]');
+            const ogImageHeight = head.querySelector('meta[property="og:image:height"]');
+            const ogType = head.querySelector('meta[property="og:type"]');
+            const ogUrl = head.querySelector('meta[property="og:url"]');
+            const fbAppId = head.querySelector('meta[property="fb:app_id"]');
+            const twitterSite = head.querySelector('meta[name="twitter:site"]');
+            const twitterTitle = head.querySelector('meta[name="twitter:title"]');
+            const twitterDescription = head.querySelector('meta[name="twitter:description"]');
+            const twitterImage = head.querySelector('meta[name="twitter:image"]');
+            const twitterCard = head.querySelector('meta[name="twitter:card"]');
+            const twitterImageAlt = head.querySelector('meta[name="twitter:image:alt"]');
+            return {
+                general: {
+                    title: title ? title.innerText : null,
+                    descripton: description ? description.content : null,
+                    keywords: keywords ? keywords.content : null,
+                },
+                facebook: {
+                    "og:title": ogTitle ? ogTitle.content : null,
+                    "og:description": ogDescription ? ogDescription.content : null,
+                    "og:site_name": ogSiteName ? ogSiteName.content : null,
+                    "og:image": ogImage ? ogImage.content : null,
+                    "og:image:width": ogImageWidth ? ogImageWidth.content : null,
+                    "og:image:height": ogImageHeight ? ogImageHeight.content : null,
+                    "og:type": ogType ? ogType.content : null,
+                    "og:url": ogUrl ? ogUrl.content : null,
+                    "fb:app_id": fbAppId ? fbAppId.content : null,
+                },
+                twitter: {
+                    "twitter:site": twitterSite ? twitterSite.content : null,
+                    "twitter:title": twitterTitle ? twitterTitle.content : null,
+                    "twitter:description": twitterDescription ? twitterDescription.content : null,
+                    "twitter:image": twitterImage ? twitterImage.content : null,
+                    "twitter:card": twitterCard ? twitterCard.content : null,
+                    "twitter:image:alt": twitterImageAlt ? twitterImageAlt.content : null,
+                }
+            };
+        });
+        spinner.stop();
+        console.log(`
+    
+        `);
+        const location = await page.evaluate(() => {
+            return window.location;
+        });
+        await page.close();
+        if (shouldPreview) {
+            page = (await browser.pages())[0];
+            // await page.exposeFunction("changeImageSize", changeImageSize);
+            await page.evaluate(({ og, changeImageSize, location }) => {
+                debugger;
+                eval("changeImageSize = " + changeImageSize);
+                let imgUrl = og["og:image"];
+                if (imgUrl) {
+                    if (imgUrl.indexOf("http") < 0) {
+                        imgUrl = location.origin + imgUrl;
+                    }
+                }
+                debugger;
+                changeImageSize(imgUrl, 1).then(img => {
+                    document.body.innerHTML = `<h2>WhatsApp</h2>
+                    <img src="${img}"/>
+                `;
+                });
+            }, {
+                changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["crop"].toString(),
+                og: result.facebook,
+                location
+            });
+        }
+        else {
+            Object(_print_tag__WEBPACK_IMPORTED_MODULE_2__["printTag"])(result);
+            await browser.close();
+        }
+    }
+    catch (error) {
+        spinner.stop();
+        console.error("some error occured");
+        console.error("Error message is", error.message);
+        console.info("please contact author of this Project");
+        process.exit();
     }
 };
-
-var PendingXHR = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer").PendingXHR;
-
-var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, function () {
-    var spinner, prefix, browser, page, pendingXHR, result, print_1, category, categoryContent, meta, metaContent, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                spinner = new cli_spinner__WEBPACK_IMPORTED_MODULE_1__["Spinner"]("Fetching.. %s");
-                // spinner. spinnerInstance = new Spinner(`${text}.. %s`);
-                spinner.setSpinnerString(18);
-                spinner.start();
-                prefix = 'http://';
-                if (url.indexOf("http") < 0) {
-                    url = prefix + url;
-                }
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 9, , 10]);
-                return [4 /*yield*/, puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
-                    // headless: false
-                    })];
-            case 2:
-                browser = _a.sent();
-                return [4 /*yield*/, browser.newPage()];
-            case 3:
-                page = _a.sent();
-                pendingXHR = new PendingXHR(page);
-                return [4 /*yield*/, page.goto(url)];
-            case 4:
-                _a.sent();
-                // await page.waitForNavigation({ waitUntil: "networkidle0" });
-                return [4 /*yield*/, pendingXHR.waitForAllXhrFinished()];
-            case 5:
-                // await page.waitForNavigation({ waitUntil: "networkidle0" });
-                _a.sent();
-                return [4 /*yield*/, new Promise(function (res) {
-                        setTimeout(res, 2000);
-                    })];
-            case 6:
-                _a.sent();
-                return [4 /*yield*/, page.evaluate(function () {
-                        var head = document.head;
-                        var title = document.querySelector("title");
-                        var description = head.querySelector('meta[name=description]');
-                        var keywords = head.querySelector('meta[property=keywords]');
-                        var ogTitle = head.querySelector('meta[property="og:title"]');
-                        var ogDescription = head.querySelector('meta[property="og:description"]');
-                        var ogSiteName = head.querySelector('meta[property="og:site_name"]');
-                        var ogImage = head.querySelector('meta[property="og:image"]');
-                        var ogImageWidth = head.querySelector('meta[property="og:image:width"]');
-                        var ogImageHeight = head.querySelector('meta[property="og:image:height"]');
-                        var ogType = head.querySelector('meta[property="og:type"]');
-                        var ogUrl = head.querySelector('meta[property="og:url"]');
-                        var fbAppId = head.querySelector('meta[property="fb:app_id"]');
-                        var twitterSite = head.querySelector('meta[name="twitter:site"]');
-                        var twitterTitle = head.querySelector('meta[name="twitter:title"]');
-                        var twitterDescription = head.querySelector('meta[name="twitter:description"]');
-                        var twitterImage = head.querySelector('meta[name="twitter:image"]');
-                        var twitterCard = head.querySelector('meta[name="twitter:card"]');
-                        var twitterImageAlt = head.querySelector('meta[name="twitter:image:alt"]');
-                        return {
-                            general: {
-                                title: title ? title.innerText : null,
-                                descripton: description ? description.content : null,
-                                keywords: keywords ? keywords.content : null,
-                            },
-                            facebook: {
-                                "og:title": ogTitle ? ogTitle.content : null,
-                                "og:description": ogDescription ? ogDescription.content : null,
-                                "og:site_name": ogSiteName ? ogSiteName.content : null,
-                                "og:image": ogImage ? ogImage.content : null,
-                                "og:image:width": ogImageWidth ? ogImageWidth.content : null,
-                                "og:image:height": ogImageHeight ? ogImageHeight.content : null,
-                                "og:type": ogType ? ogType.content : null,
-                                "og:url": ogUrl ? ogUrl.content : null,
-                                "fb:app_id": fbAppId ? fbAppId.content : null,
-                            },
-                            twitter: {
-                                "twitter:site": twitterSite ? twitterSite.content : null,
-                                "twitter:title": twitterTitle ? twitterTitle.content : null,
-                                "twitter:description": twitterDescription ? twitterDescription.content : null,
-                                "twitter:image": twitterImage ? twitterImage.content : null,
-                                "twitter:card": twitterCard ? twitterCard.content : null,
-                                "twitter:image:alt": twitterImageAlt ? twitterImageAlt.content : null,
-                            }
-                        };
-                    })];
-            case 7:
-                result = _a.sent();
-                spinner.stop();
-                console.log("\n    \n    ");
-                print_1 = function (message) {
-                    console.log(message);
-                };
-                for (category in result) {
-                    categoryContent = result[category];
-                    if (Object.keys(categoryContent).length == 0) {
-                        return [2 /*return*/];
-                    }
-                    console.log("--------------------------" + category + "------------------------------");
-                    console.log("");
-                    for (meta in categoryContent) {
-                        metaContent = categoryContent[meta];
-                        if (metaContent) {
-                            console.log(meta + " : \"" + metaContent + "\"");
-                            console.log("");
-                        }
-                    }
-                }
-                return [4 /*yield*/, browser.close()];
-            case 8:
-                _a.sent();
-                return [3 /*break*/, 10];
-            case 9:
-                error_1 = _a.sent();
-                spinner.stop();
-                console.error("some error occured");
-                console.error("Error message is", error_1.message);
-                console.info("please contact author of this Project");
-                process.exit();
-                return [3 /*break*/, 10];
-            case 10: return [2 /*return*/];
-        }
-    });
-}); };
 
 
 /***/ }),
@@ -283,13 +336,48 @@ var fetchMeta = function (url) { return __awaiter(void 0, void 0, void 0, functi
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fetch_meta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./fetch_meta */ "./src/fetch_meta.ts");
 
-var Command = __webpack_require__(/*! commander */ "commander").Command;
-var program = new Command();
+const { Command } = __webpack_require__(/*! commander */ "commander");
+const program = new Command();
 program
-    .option('-url, --url <value>', 'absolute url of website');
+    .option('-url, --url <value>', 'absolute url of website')
+    .option('-preview, --preview', 'preview tags in different popular application like whatsapp, facebook, twitter etc.');
 program.parse(process.argv);
 if (program.url) {
-    Object(_fetch_meta__WEBPACK_IMPORTED_MODULE_0__["fetchMeta"])(program.url);
+    Object(_fetch_meta__WEBPACK_IMPORTED_MODULE_0__["fetchMeta"])(program.url, program.preview != null);
+}
+
+
+/***/ }),
+
+/***/ "./src/print_tag.ts":
+/*!**************************!*\
+  !*** ./src/print_tag.ts ***!
+  \**************************/
+/*! exports provided: printTag */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "printTag", function() { return printTag; });
+function printTag(tagMap) {
+    const print = (message) => {
+        console.log(message);
+    };
+    for (const category in tagMap) {
+        const categoryContent = tagMap[category];
+        if (Object.keys(categoryContent).length == 0) {
+            return;
+        }
+        console.log(`--------------------------${category}------------------------------`);
+        console.log("");
+        for (const meta in categoryContent) {
+            const metaContent = categoryContent[meta];
+            if (metaContent) {
+                console.log(`${meta} : "${metaContent}"`);
+                console.log("");
+            }
+        }
+    }
 }
 
 

@@ -1,9 +1,11 @@
 import puppeteer from "puppeteer";
 const { PendingXHR } = require('pending-xhr-puppeteer');
 import { Spinner } from "cli-spinner";
+import { printTag } from "./print_tag";
+import { changeImageSize, crop } from "./change_img";
 
 
-export const fetchMeta = async (url: string) => {
+export const fetchMeta = async (url: string, shouldPreview) => {
     const spinner = new Spinner(`Fetching.. %s`);
     // spinner. spinnerInstance = new Spinner(`${text}.. %s`);
     spinner.setSpinnerString(18);
@@ -14,9 +16,10 @@ export const fetchMeta = async (url: string) => {
     }
     try {
         const browser = await puppeteer.launch({
-            // headless: false
+            headless: !shouldPreview,
+            devtools: true
         });
-        const page = await browser.newPage();
+        let page = await browser.newPage();
         const pendingXHR = new PendingXHR(page)
         await page.goto(url);
         // await page.waitForNavigation({ waitUntil: "networkidle0" });
@@ -79,27 +82,41 @@ export const fetchMeta = async (url: string) => {
         spinner.stop();
         console.log(`
     
-    `);
-        const print = (message) => {
-            console.log(message);
+        `);
+        const location = await page.evaluate(() => {
+            return window.location;
+        })
+        await page.close();
+        if (shouldPreview) {
+            page = (await browser.pages())[0];
+            // await page.exposeFunction("changeImageSize", changeImageSize);
+            await page.evaluate(({ og, changeImageSize, location }) => {
+                debugger;
+                eval("changeImageSize = " + changeImageSize)
+                let imgUrl = og["og:image"];
+                if (imgUrl) {
+                    if (imgUrl.indexOf("http") < 0) {
+                        imgUrl = location.origin + imgUrl;
+                    }
+                }
+                changeImageSize(imgUrl, 1).then(img => {
+                    document.body.innerHTML = `<h2>WhatsApp</h2>
+                    <img src="${img}"/>
+                `;
+                })
+
+            }, {
+                changeImageSize: crop.toString(),
+                og: result.facebook,
+                location
+            } as any)
+
+        }
+        else {
+            printTag(result);
+            await browser.close();
         }
 
-        for (const category in result) {
-            const categoryContent = result[category];
-            if (Object.keys(categoryContent).length == 0) {
-                return;
-            }
-            console.log(`--------------------------${category}------------------------------`);
-            console.log("");
-            for (const meta in categoryContent) {
-                const metaContent = categoryContent[meta];
-                if (metaContent) {
-                    console.log(`${meta} : "${metaContent}"`);
-                    console.log("");
-                }
-            }
-        }
-        await browser.close();
     } catch (error) {
         spinner.stop();
         console.error("some error occured");
