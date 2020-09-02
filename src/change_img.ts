@@ -52,6 +52,7 @@ export const crop = function (url, aspectRatio) {
 
         // this image will hold our source image data
         const inputImage = new Image();
+        inputImage.crossOrigin = "true";
 
         // we want to wait for our image to load
         inputImage.onload = () => {

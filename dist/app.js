@@ -143,12 +143,11 @@ const changeImageSize = async function (dataUrl, width, height, quality = 1 // e
 const crop = function (url, aspectRatio) {
     // we return a Promise that gets resolved with our canvas element
     return new Promise(resolve => {
-        debugger;
         // this image will hold our source image data
         const inputImage = new Image();
+        inputImage.crossOrigin = "true";
         // we want to wait for our image to load
         inputImage.onload = () => {
-            debugger;
             // let's store the width and height of our image
             const inputWidth = inputImage.naturalWidth;
             const inputHeight = inputImage.naturalHeight;
@@ -219,7 +218,8 @@ const fetchMeta = async (url, shouldPreview) => {
     try {
         const browser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
             headless: !shouldPreview,
-            devtools: true
+            devtools: true,
+            args: ['--disable-infobars']
         });
         let page = await browser.newPage();
         const pendingXHR = new PendingXHR(page);
@@ -287,23 +287,73 @@ const fetchMeta = async (url, shouldPreview) => {
         if (shouldPreview) {
             page = (await browser.pages())[0];
             // await page.exposeFunction("changeImageSize", changeImageSize);
-            await page.evaluate(({ og, changeImageSize, location }) => {
-                debugger;
+            await page.evaluate(async ({ og, changeImageSize, crop, location }) => {
                 eval("changeImageSize = " + changeImageSize);
+                eval("crop = " + crop);
                 let imgUrl = og["og:image"];
                 if (imgUrl) {
                     if (imgUrl.indexOf("http") < 0) {
                         imgUrl = location.origin + imgUrl;
                     }
                 }
-                debugger;
-                changeImageSize(imgUrl, 1).then(img => {
-                    document.body.innerHTML = `<h2>WhatsApp</h2>
-                    <img src="${img}"/>
+                const croppedImg = await crop(imgUrl, 1);
+                const img = await changeImageSize(croppedImg, 78, 78);
+                document.body.innerHTML = `<h2>WhatsApp</h2>
+                <div class="whatsapp">
+                   <div class="whatsapp_text">
+                        <img class="whatsapp_text_img" src="${img}"/>
+                        <div class="whatsapp_text_tag">
+                            <div class="whatsapp_text_tag_title">${og["og:title"]}</div>
+                            <div class="whatsapp_text_tag_desc">${og["og:description"]}</div>
+                            <div class="whatsapp_text_tag_link">${og["og:url"]}</div>
+                        </div>
+                   </div>
+                   <a href="${og["og:url"]}">${og["og:url"]}</a>
+                </div>
+                <style>
+                .whatsapp{
+                    display:flex;
+                    flex-direction:column;
+                    padding: 6px 7px 8px 9px;
+                    background: #dcf8c6;
+                }
+                .whatsapp_text{
+                    display:flex;
+                    background:#cfe9ba;
+                    margin: -3px -4px 6px -6px;
+                    border-radius: 6px;
+                }
+                .whatsapp_text_img{
+                    height: 90px;
+                    max-height: 100%;
+                }
+                .whatsapp_text_tag{
+                    display:flex;
+                    flex-direction:column;
+                    padding: 6px 10px;
+                }
+                .whatsapp_text_tag_title{
+                    margin-bottom:2px;
+                    color:#000;
+                    font-weight:400;
+                    font-size:14px;
+                }
+                .whatsapp_text_tag_desc{
+                    font-size:12px;
+                    color:rgb(0,0,0,0.45);
+                    font-weight:400;
+                }
+                .whatsapp_text_tag_link{
+                    font-size:12px;
+                    color:rgb(0,0,0,0.8);
+                    font-weight:400;
+                    padding-top:1px;
+                }
+                </style>
                 `;
-                });
             }, {
-                changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["crop"].toString(),
+                changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["changeImageSize"].toString(),
+                crop: _change_img__WEBPACK_IMPORTED_MODULE_3__["crop"].toString(),
                 og: result.facebook,
                 location
             });
