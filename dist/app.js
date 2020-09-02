@@ -173,7 +173,7 @@ const crop = function (url, aspectRatio) {
             // draw our image at position 0, 0 on the canvas
             const ctx = outputImage.getContext('2d');
             ctx.drawImage(inputImage, outputX, outputY);
-            document.body.appendChild(outputImage);
+            // document.body.appendChild(outputImage);
             // resolve(outputImage);
             resolve(outputImage.toDataURL("image/png"));
         };
@@ -201,8 +201,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var cli_spinner__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cli_spinner__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _print_tag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./print_tag */ "./src/print_tag.ts");
 /* harmony import */ var _change_img__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./change_img */ "./src/change_img.ts");
+/* harmony import */ var _preview_whatsapp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./preview_whatsapp */ "./src/preview_whatsapp.ts");
+/* harmony import */ var _preview_fb__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./preview_fb */ "./src/preview_fb.ts");
 
 const { PendingXHR } = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer");
+
+
 
 
 
@@ -293,7 +297,7 @@ const fetchMeta = async (url, shouldPreview) => {
                 html, body, #app {
                     height: 100%;
                     width: 100%;
-                    overflow: hidden;
+                    // overflow: hidden;
                     padding: 0;
                     margin: 0;
                 }
@@ -318,86 +322,14 @@ const fetchMeta = async (url, shouldPreview) => {
                 meta.content = "width=device-width";
                 document.head.appendChild(meta);
             });
-            await page.evaluate(async ({ og, changeImageSize, crop, location }) => {
-                eval("changeImageSize = " + changeImageSize);
-                eval("crop = " + crop);
-                let imgUrl = og["og:image"];
-                if (imgUrl) {
-                    if (imgUrl.indexOf("http") < 0) {
-                        imgUrl = location.origin + imgUrl;
-                    }
-                }
-                const croppedImg = await crop(imgUrl, 1);
-                const img = await changeImageSize(croppedImg, 78, 78);
-                const whatsapp = document.createElement('div');
-                whatsapp.innerHTML = `<h2>WhatsApp</h2>
-                <div class="whatsapp">
-                   <div class="whatsapp_text">
-                        <img class="whatsapp_text_img" src="${img}"/>
-                        <div class="whatsapp_text_tag">
-                            <div class="whatsapp_text_tag_title">${og["og:title"]}</div>
-                            <div class="whatsapp_text_tag_desc">${og["og:description"]}</div>
-                            <div class="whatsapp_text_tag_host">${location.host}</div>
-                        </div>
-                   </div>
-                   <a href="${og["og:url"]}">${og["og:url"]}</a>
-                </div>
-                <style>
-                .whatsapp{
-                    display:flex;
-                    flex-direction:column;
-                    padding: 6px 7px 8px 9px;
-                    background: #dcf8c6;
-                    box-shadow: 0 1px .5px rgba(var(--shadow-rgb),.13);
-                    border-radius: 7.5px;
-                    border-top-right-radius: 0;
-                    max-width: 95%;
-                }
-                .whatsapp_text{
-                    display:flex;
-                    background:#cfe9ba;
-                    margin: -3px -4px 6px -6px;
-                    border-radius: 6px;
-                }
-                .whatsapp_text_img{
-                    height: 90px;
-                    max-height: 100%;
-                }
-                .whatsapp_text_tag{
-                    display:flex;
-                    flex-direction:column;
-                    padding: 6px 10px;
-                }
-                .whatsapp_text_tag_title{
-                    margin-bottom:2px;
-                    color:#000;
-                    font-weight:400;
-                    font-size:14px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-                .whatsapp_text_tag_desc{
-                    font-size:12px;
-                    color:rgb(0,0,0,0.45);
-                    font-weight:400;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-                .whatsapp_text_tag_host{
-                    font-size:12px;
-                    color:rgb(0,0,0,0.8);
-                    font-weight:400;
-                    padding-top:1px;
-                }
-                </style>
-                `;
-                document.querySelector("#app").appendChild(whatsapp);
-            }, {
+            const payloadForApp = {
                 changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["changeImageSize"].toString(),
                 crop: _change_img__WEBPACK_IMPORTED_MODULE_3__["crop"].toString(),
                 og: result.facebook,
                 location
-            });
+            };
+            await Object(_preview_whatsapp__WEBPACK_IMPORTED_MODULE_4__["previewWhatsApp"])(page, payloadForApp);
+            await Object(_preview_fb__WEBPACK_IMPORTED_MODULE_5__["previewfacebook"])(page, payloadForApp);
         }
         else {
             Object(_print_tag__WEBPACK_IMPORTED_MODULE_2__["printTag"])(result);
@@ -435,6 +367,191 @@ program
 program.parse(process.argv);
 if (program.url) {
     Object(_fetch_meta__WEBPACK_IMPORTED_MODULE_0__["fetchMeta"])(program.url, program.preview != null);
+}
+
+
+/***/ }),
+
+/***/ "./src/preview_fb.ts":
+/*!***************************!*\
+  !*** ./src/preview_fb.ts ***!
+  \***************************/
+/*! exports provided: previewfacebook */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "previewfacebook", function() { return previewfacebook; });
+function previewfacebook(page, options) {
+    return page.evaluate(async ({ og, changeImageSize, crop, location }) => {
+        eval("changeImageSize = " + changeImageSize);
+        eval("crop = " + crop);
+        let imgUrl = og["og:image"];
+        if (imgUrl) {
+            if (imgUrl.indexOf("http") < 0) {
+                imgUrl = location.origin + imgUrl;
+            }
+        }
+        const croppedImg = await crop(imgUrl, 1.91 / 1);
+        const img = await changeImageSize(croppedImg, 540, 281);
+        const facebook = document.createElement('div');
+        facebook.innerHTML = `<h2>Facebook</h2>
+        <div class="facebook">
+            <img class="facebook_image" src="${img}">
+            <div class="facebook_text">
+                <div class="facebook_text_host">${location.host}</div>
+                <div class="facebook_text_title">${og["og:title"]}</div>
+                <div class="facebook_text_desc">${og["og:description"]}</div>
+            </div>
+        </div>
+        <style>
+        .facebook{
+            display:flex;
+            flex-direction:column;
+            border-left: 1px solid #dadde1;
+            border-right: 1px solid #dadde1;
+            border-bottom: 1px solid #dadde1;
+            width: fit-content;
+            margin-bottom: 50px;
+        }
+
+        .facebook_image{
+            width: 524px;
+            height: 274px;
+        }
+
+        .facebook_text{
+            display:flex;
+            flex-direction:column;
+            max-height: 190px;
+            padding: 10px 12px;
+        }
+
+        .facebook_text_host{
+            color: #606770;
+            flex-shrink: 0;
+            font-size: 12px;
+            line-height: 16px;
+            overflow: hidden;
+            padding: 0;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .facebook_text_title{
+            font-weight: 600;
+            overflow: hidden;
+            font-family: inherit;
+            font-size: 16px;
+            line-height: 20px;
+            margin: 3px 0 0;
+            padding-top: 2px;
+        }
+
+        .facebook_text_desc{
+            margin-top: 3px;
+            color: #606770;
+            font-size: 14px;
+            line-height: 20px;
+            word-break: break-word;
+        }
+         
+        </style>
+        `;
+        document.querySelector("#app").appendChild(facebook);
+    }, options);
+}
+
+
+/***/ }),
+
+/***/ "./src/preview_whatsapp.ts":
+/*!*********************************!*\
+  !*** ./src/preview_whatsapp.ts ***!
+  \*********************************/
+/*! exports provided: previewWhatsApp */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "previewWhatsApp", function() { return previewWhatsApp; });
+function previewWhatsApp(page, options) {
+    return page.evaluate(async ({ og, changeImageSize, crop, location }) => {
+        eval("changeImageSize = " + changeImageSize);
+        eval("crop = " + crop);
+        let imgUrl = og["og:image"];
+        if (imgUrl) {
+            if (imgUrl.indexOf("http") < 0) {
+                imgUrl = location.origin + imgUrl;
+            }
+        }
+        const croppedImg = await crop(imgUrl, 1);
+        const img = await changeImageSize(croppedImg, 78, 78);
+        const whatsapp = document.createElement('div');
+        whatsapp.innerHTML = `<h2>WhatsApp</h2>
+        <div class="whatsapp">
+           <div class="whatsapp_text">
+                <img class="whatsapp_text_img" src="${img}"/>
+                <div class="whatsapp_text_tag">
+                    <div class="whatsapp_text_tag_title">${og["og:title"]}</div>
+                    <div class="whatsapp_text_tag_desc">${og["og:description"]}</div>
+                    <div class="whatsapp_text_tag_host">${location.host}</div>
+                </div>
+           </div>
+           <a href="${og["og:url"]}">${og["og:url"]}</a>
+        </div>
+        <style>
+        .whatsapp{
+            display:flex;
+            flex-direction:column;
+            padding: 6px 7px 8px 9px;
+            background: #dcf8c6;
+            box-shadow: 0 1px .5px rgba(var(--shadow-rgb),.13);
+            border-radius: 7.5px;
+            border-top-right-radius: 0;
+            max-width: 95%;
+        }
+        .whatsapp_text{
+            display:flex;
+            background:#cfe9ba;
+            margin: -3px -4px 6px -6px;
+            border-radius: 6px;
+        }
+        .whatsapp_text_img{
+            height: 90px;
+            max-height: 100%;
+        }
+        .whatsapp_text_tag{
+            display:flex;
+            flex-direction:column;
+            padding: 6px 10px;
+        }
+        .whatsapp_text_tag_title{
+            margin-bottom:2px;
+            color:#000;
+            font-weight:400;
+            font-size:14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .whatsapp_text_tag_desc{
+            font-size:12px;
+            color:rgb(0,0,0,0.45);
+            font-weight:400;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .whatsapp_text_tag_host{
+            font-size:12px;
+            color:rgb(0,0,0,0.8);
+            font-weight:400;
+            padding-top:1px;
+        }
+        </style>
+        `;
+        document.querySelector("#app").appendChild(whatsapp);
+    }, options);
 }
 
 
