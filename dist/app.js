@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :readmeta - V1.0.2 - 02/09/2020
+ * @license :readmeta - V1.1.0 - 03/09/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */
@@ -222,7 +222,6 @@ const fetchMeta = async (url, shouldPreview) => {
     try {
         const browser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
             headless: !shouldPreview,
-            devtools: true,
         });
         let page = await browser.newPage();
         const pendingXHR = new PendingXHR(page);

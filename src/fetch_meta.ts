@@ -19,7 +19,7 @@ export const fetchMeta = async (url: string, shouldPreview) => {
     try {
         const browser = await puppeteer.launch({
             headless: !shouldPreview,
-            devtools: true,
+            // devtools: true,
             // args: ['--disable-infobars']
         });
         let page = await browser.newPage();
