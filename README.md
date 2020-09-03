@@ -20,6 +20,26 @@ sudo npm i readmeta -g --unsafe-perm=true
 
 # Example 
 
-* readmeta --url=google.com
+## Fetch meta
 
-* readmeta --url=http://google.com
+This will show all meta tags in console
+
+```
+readmeta --url=google.com
+```
+
+OR (with http included)
+
+```
+readmeta --url=http://google.com
+```
+
+## Preview meta
+
+This will open a browser and show how your app will be previewed in different app like facebook, whatsapp, twitter etc.
+
+```
+readmeta --url=http://google.com --preview
+```
+
+

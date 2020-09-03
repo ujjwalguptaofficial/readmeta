@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :readmeta - V1.1.0 - 03/09/2020
+ * @license :readmeta - V1.1.1 - 03/09/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */
@@ -220,12 +220,16 @@ const fetchMeta = async (url, shouldPreview) => {
         url = prefix + url;
     }
     try {
-        const browser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
+        const previewBrowser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
             headless: !shouldPreview,
         });
-        let page = await browser.newPage();
-        const firstPage = (await browser.pages())[0];
-        firstPage.bringToFront();
+        const backGroundBrowser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
+        // headless: false,
+        // devtools: true,
+        // args: ['--disable-infobars']
+        });
+        let page = await backGroundBrowser.newPage();
+        const firstPage = (await previewBrowser.pages())[0];
         await firstPage.evaluate(() => {
             document.body.innerHTML = `<div id="app">
             <div class="app_note"></div>
@@ -376,7 +380,8 @@ const fetchMeta = async (url, shouldPreview) => {
         const location = await page.evaluate(() => {
             return window.location;
         });
-        await page.close();
+        // await page.close();
+        backGroundBrowser.close();
         if (shouldPreview) {
             const payloadForApp = {
                 changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["changeImageSize"].toString(),
@@ -394,7 +399,7 @@ const fetchMeta = async (url, shouldPreview) => {
         }
         else {
             Object(_print_tag__WEBPACK_IMPORTED_MODULE_2__["printTag"])(result);
-            await browser.close();
+            await previewBrowser.close();
         }
     }
     catch (error) {
