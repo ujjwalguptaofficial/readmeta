@@ -347,6 +347,51 @@ const fetchMeta = async (url, shouldPreview) => {
 
 /***/ }),
 
+/***/ "./src/helpers/get_package_version.ts":
+/*!********************************************!*\
+  !*** ./src/helpers/get_package_version.ts ***!
+  \********************************************/
+/*! exports provided: getPackageVersion */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getPackageVersion", function() { return getPackageVersion; });
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path */ "path");
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const getPackageVersion = function () {
+    const pathOfPackage = path__WEBPACK_IMPORTED_MODULE_1__["join"](__dirname, ".././package.json");
+    const contents = Object(fs__WEBPACK_IMPORTED_MODULE_0__["readFileSync"])(pathOfPackage, {
+        encoding: "utf8"
+    });
+    const packageInfo = JSON.parse(contents);
+    return packageInfo.version;
+};
+
+
+/***/ }),
+
+/***/ "./src/helpers/index.ts":
+/*!******************************!*\
+  !*** ./src/helpers/index.ts ***!
+  \******************************/
+/*! exports provided: getPackageVersion */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _get_package_version__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./get_package_version */ "./src/helpers/get_package_version.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "getPackageVersion", function() { return _get_package_version__WEBPACK_IMPORTED_MODULE_0__["getPackageVersion"]; });
+
+
+
+
+/***/ }),
+
 /***/ "./src/index.ts":
 /*!**********************!*\
   !*** ./src/index.ts ***!
@@ -357,10 +402,12 @@ const fetchMeta = async (url, shouldPreview) => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fetch_meta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./fetch_meta */ "./src/fetch_meta.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers */ "./src/helpers/index.ts");
+
 
 const { Command } = __webpack_require__(/*! commander */ "commander");
 const program = new Command();
-program
+program.version(Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["getPackageVersion"])(), '-v, --version')
     .option('-url, --url <value>', 'absolute url of website')
     .option('-preview, --preview', 'preview tags in different popular application like whatsapp, facebook, twitter etc.');
 program.parse(process.argv);
@@ -621,6 +668,28 @@ module.exports = require("cli-spinner");
 /***/ (function(module, exports) {
 
 module.exports = require("commander");
+
+/***/ }),
+
+/***/ "fs":
+/*!*********************!*\
+  !*** external "fs" ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
 
 /***/ }),
 
