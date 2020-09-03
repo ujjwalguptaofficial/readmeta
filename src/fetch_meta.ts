@@ -39,7 +39,7 @@ export const fetchMeta = async (url: string, shouldPreview) => {
             const ogTitle = head.querySelector('meta[property="og:title"]') as HTMLMetaElement;
             const ogDescription = head.querySelector('meta[property="og:description"]') as HTMLMetaElement;
             const ogSiteName = head.querySelector('meta[property="og:site_name"]') as HTMLMetaElement;
-            const ogImage = head.querySelector('meta[property="og:image"]') as HTMLMetaElement;
+            const ogImages = head.querySelectorAll('meta[property="og:image"]') as NodeList;
             const ogImageWidth = head.querySelector('meta[property="og:image:width"]') as HTMLMetaElement;
             const ogImageHeight = head.querySelector('meta[property="og:image:height"]') as HTMLMetaElement;
             const ogType = head.querySelector('meta[property="og:type"]') as HTMLMetaElement;
@@ -53,6 +53,16 @@ export const fetchMeta = async (url: string, shouldPreview) => {
             const twitterCard = head.querySelector('meta[name="twitter:card"]') as HTMLMetaElement;
             const twitterImageAlt = head.querySelector('meta[name="twitter:image:alt"]') as HTMLMetaElement;
 
+
+            function getOgImageContent() {
+                return ogImages.length > 1 ? (() => {
+                    const contents = [];
+                    ogImages.forEach((val: HTMLMetaElement) => {
+                        contents.push(val.content);
+                    });
+                    return contents;
+                })() : (ogImages[0] as HTMLMetaElement).content;
+            }
             return {
                 general: {
                     title: title ? title.innerText : null,
@@ -63,7 +73,7 @@ export const fetchMeta = async (url: string, shouldPreview) => {
                     "og:title": ogTitle ? ogTitle.content : null,
                     "og:description": ogDescription ? ogDescription.content : null,
                     "og:site_name": ogSiteName ? ogSiteName.content : null,
-                    "og:image": ogImage ? ogImage.content : null,
+                    "og:image": ogImages.length > 0 ? getOgImageContent() : null,
                     "og:image:width": ogImageWidth ? ogImageWidth.content : null,
                     "og:image:height": ogImageHeight ? ogImageHeight.content : null,
                     "og:type": ogType ? ogType.content : null,
@@ -131,8 +141,9 @@ export const fetchMeta = async (url: string, shouldPreview) => {
                 og: result.facebook,
                 location
             };
+            console.log("Rendering whatsapp\n");
             await previewWhatsApp(page, payloadForApp);
-
+            console.log("Rendering facebook\n");
             await previewfacebook(page, payloadForApp);
 
         }

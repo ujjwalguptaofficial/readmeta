@@ -1,17 +1,20 @@
 export function previewWhatsApp(page, options) {
     return page.evaluate(async ({ og, changeImageSize, crop, location }) => {
-        eval("changeImageSize = " + changeImageSize)
-        eval("crop = " + crop);
-        let imgUrl = og["og:image"];
-        if (imgUrl) {
-            if (imgUrl.indexOf("http") < 0) {
-                imgUrl = location.origin + imgUrl;
+        try {
+            eval("changeImageSize = " + changeImageSize)
+            eval("crop = " + crop);
+            let imgUrl = og["og:image"];
+            debugger;
+            imgUrl = Array.isArray(imgUrl) ? imgUrl[1] : imgUrl;
+            if (imgUrl) {
+                if (imgUrl.indexOf("http") < 0) {
+                    imgUrl = location.origin + imgUrl;
+                }
             }
-        }
-        const croppedImg = await crop(imgUrl, 1);
-        const img = await changeImageSize(croppedImg, 78, 78);
-        const whatsapp = document.createElement('div');
-        whatsapp.innerHTML = `<h2>WhatsApp</h2>
+            const croppedImg = await crop(imgUrl, 1);
+            const img = await changeImageSize(croppedImg, 78, 78);
+            const whatsapp = document.createElement('div');
+            whatsapp.innerHTML = `<h2>WhatsApp</h2>
         <div class="whatsapp">
            <div class="whatsapp_text">
                 <img class="whatsapp_text_img" src="${img}"/>
@@ -72,6 +75,10 @@ export function previewWhatsApp(page, options) {
         }
         </style>
         `;
-        document.querySelector("#app").appendChild(whatsapp);
+            document.querySelector("#app").appendChild(whatsapp);
+        } catch (error) {
+            console.error(error);
+            window.alert(`Some error occured - ${error.message}`);
+        }
     }, options);
 }

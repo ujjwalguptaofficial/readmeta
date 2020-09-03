@@ -14,7 +14,7 @@ export function printTag(tagMap) {
         for (const meta in categoryContent) {
             const metaContent = categoryContent[meta];
             if (metaContent) {
-                console.log(`${meta} : "${metaContent}"`);
+                console.log(`${meta} : ${typeof metaContent === "object" ? JSON.stringify(metaContent) : '"' + metaContent + '"'}`);
                 console.log("");
             }
         }

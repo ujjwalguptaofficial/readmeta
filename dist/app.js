@@ -239,7 +239,7 @@ const fetchMeta = async (url, shouldPreview) => {
             const ogTitle = head.querySelector('meta[property="og:title"]');
             const ogDescription = head.querySelector('meta[property="og:description"]');
             const ogSiteName = head.querySelector('meta[property="og:site_name"]');
-            const ogImage = head.querySelector('meta[property="og:image"]');
+            const ogImages = head.querySelectorAll('meta[property="og:image"]');
             const ogImageWidth = head.querySelector('meta[property="og:image:width"]');
             const ogImageHeight = head.querySelector('meta[property="og:image:height"]');
             const ogType = head.querySelector('meta[property="og:type"]');
@@ -251,6 +251,15 @@ const fetchMeta = async (url, shouldPreview) => {
             const twitterImage = head.querySelector('meta[name="twitter:image"]');
             const twitterCard = head.querySelector('meta[name="twitter:card"]');
             const twitterImageAlt = head.querySelector('meta[name="twitter:image:alt"]');
+            function getOgImageContent() {
+                return ogImages.length > 1 ? (() => {
+                    const contents = [];
+                    ogImages.forEach((val) => {
+                        contents.push(val.content);
+                    });
+                    return contents;
+                })() : ogImages[0].content;
+            }
             return {
                 general: {
                     title: title ? title.innerText : null,
@@ -261,7 +270,7 @@ const fetchMeta = async (url, shouldPreview) => {
                     "og:title": ogTitle ? ogTitle.content : null,
                     "og:description": ogDescription ? ogDescription.content : null,
                     "og:site_name": ogSiteName ? ogSiteName.content : null,
-                    "og:image": ogImage ? ogImage.content : null,
+                    "og:image": ogImages.length > 0 ? getOgImageContent() : null,
                     "og:image:width": ogImageWidth ? ogImageWidth.content : null,
                     "og:image:height": ogImageHeight ? ogImageHeight.content : null,
                     "og:type": ogType ? ogType.content : null,
@@ -327,7 +336,9 @@ const fetchMeta = async (url, shouldPreview) => {
                 og: result.facebook,
                 location
             };
+            console.log("Rendering whatsapp\n");
             await Object(_preview_whatsapp__WEBPACK_IMPORTED_MODULE_4__["previewWhatsApp"])(page, payloadForApp);
+            console.log("Rendering facebook\n");
             await Object(_preview_fb__WEBPACK_IMPORTED_MODULE_5__["previewfacebook"])(page, payloadForApp);
         }
         else {
@@ -430,18 +441,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "previewfacebook", function() { return previewfacebook; });
 function previewfacebook(page, options) {
     return page.evaluate(async ({ og, changeImageSize, crop, location }) => {
-        eval("changeImageSize = " + changeImageSize);
-        eval("crop = " + crop);
-        let imgUrl = og["og:image"];
-        if (imgUrl) {
-            if (imgUrl.indexOf("http") < 0) {
-                imgUrl = location.origin + imgUrl;
+        try {
+            eval("changeImageSize = " + changeImageSize);
+            eval("crop = " + crop);
+            let imgUrl = og["og:image"];
+            imgUrl = Array.isArray(imgUrl) ? imgUrl[0] : imgUrl;
+            if (imgUrl) {
+                if (imgUrl.indexOf("http") < 0) {
+                    imgUrl = location.origin + imgUrl;
+                }
             }
-        }
-        const croppedImg = await crop(imgUrl, 1.91 / 1);
-        const img = await changeImageSize(croppedImg, 540, 281);
-        const facebook = document.createElement('div');
-        facebook.innerHTML = `<h2>Facebook</h2>
+            const croppedImg = await crop(imgUrl, 1.91 / 1);
+            const img = await changeImageSize(croppedImg, 540, 281);
+            const facebook = document.createElement('div');
+            facebook.innerHTML = `<h2>Facebook</h2>
         <div class="facebook">
             <img class="facebook_image" src="${img}">
             <div class="facebook_text">
@@ -505,7 +518,12 @@ function previewfacebook(page, options) {
          
         </style>
         `;
-        document.querySelector("#app").appendChild(facebook);
+            document.querySelector("#app").appendChild(facebook);
+        }
+        catch (error) {
+            console.error(error);
+            window.alert(`Some error occured - ${error.message}`);
+        }
     }, options);
 }
 
@@ -524,18 +542,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "previewWhatsApp", function() { return previewWhatsApp; });
 function previewWhatsApp(page, options) {
     return page.evaluate(async ({ og, changeImageSize, crop, location }) => {
-        eval("changeImageSize = " + changeImageSize);
-        eval("crop = " + crop);
-        let imgUrl = og["og:image"];
-        if (imgUrl) {
-            if (imgUrl.indexOf("http") < 0) {
-                imgUrl = location.origin + imgUrl;
+        try {
+            eval("changeImageSize = " + changeImageSize);
+            eval("crop = " + crop);
+            let imgUrl = og["og:image"];
+            debugger;
+            imgUrl = Array.isArray(imgUrl) ? imgUrl[1] : imgUrl;
+            if (imgUrl) {
+                if (imgUrl.indexOf("http") < 0) {
+                    imgUrl = location.origin + imgUrl;
+                }
             }
-        }
-        const croppedImg = await crop(imgUrl, 1);
-        const img = await changeImageSize(croppedImg, 78, 78);
-        const whatsapp = document.createElement('div');
-        whatsapp.innerHTML = `<h2>WhatsApp</h2>
+            const croppedImg = await crop(imgUrl, 1);
+            const img = await changeImageSize(croppedImg, 78, 78);
+            const whatsapp = document.createElement('div');
+            whatsapp.innerHTML = `<h2>WhatsApp</h2>
         <div class="whatsapp">
            <div class="whatsapp_text">
                 <img class="whatsapp_text_img" src="${img}"/>
@@ -596,7 +617,12 @@ function previewWhatsApp(page, options) {
         }
         </style>
         `;
-        document.querySelector("#app").appendChild(whatsapp);
+            document.querySelector("#app").appendChild(whatsapp);
+        }
+        catch (error) {
+            console.error(error);
+            window.alert(`Some error occured - ${error.message}`);
+        }
     }, options);
 }
 
@@ -627,7 +653,7 @@ function printTag(tagMap) {
         for (const meta in categoryContent) {
             const metaContent = categoryContent[meta];
             if (metaContent) {
-                console.log(`${meta} : "${metaContent}"`);
+                console.log(`${meta} : ${typeof metaContent === "object" ? JSON.stringify(metaContent) : '"' + metaContent + '"'}`);
                 console.log("");
             }
         }

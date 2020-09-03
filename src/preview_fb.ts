@@ -1,17 +1,20 @@
 export function previewfacebook(page, options) {
     return page.evaluate(async ({ og, changeImageSize, crop, location }) => {
-        eval("changeImageSize = " + changeImageSize)
-        eval("crop = " + crop);
-        let imgUrl = og["og:image"];
-        if (imgUrl) {
-            if (imgUrl.indexOf("http") < 0) {
-                imgUrl = location.origin + imgUrl;
+        try {
+
+            eval("changeImageSize = " + changeImageSize)
+            eval("crop = " + crop);
+            let imgUrl = og["og:image"];
+            imgUrl = Array.isArray(imgUrl) ? imgUrl[0] : imgUrl;
+            if (imgUrl) {
+                if (imgUrl.indexOf("http") < 0) {
+                    imgUrl = location.origin + imgUrl;
+                }
             }
-        }
-        const croppedImg = await crop(imgUrl, 1.91 / 1);
-        const img = await changeImageSize(croppedImg, 540, 281);
-        const facebook = document.createElement('div');
-        facebook.innerHTML = `<h2>Facebook</h2>
+            const croppedImg = await crop(imgUrl, 1.91 / 1);
+            const img = await changeImageSize(croppedImg, 540, 281);
+            const facebook = document.createElement('div');
+            facebook.innerHTML = `<h2>Facebook</h2>
         <div class="facebook">
             <img class="facebook_image" src="${img}">
             <div class="facebook_text">
@@ -75,6 +78,10 @@ export function previewfacebook(page, options) {
          
         </style>
         `;
-        document.querySelector("#app").appendChild(facebook);
+            document.querySelector("#app").appendChild(facebook);
+        } catch (error) {
+            console.error(error);
+            window.alert(`Some error occured - ${error.message}`);
+        }
     }, options);
 }
