@@ -23,6 +23,88 @@ export const fetchMeta = async (url: string, shouldPreview) => {
             // args: ['--disable-infobars']
         });
         let page = await browser.newPage();
+        const firstPage = (await browser.pages())[0];
+        firstPage.bringToFront();
+        await firstPage.evaluate(() => {
+            document.body.innerHTML = `<div id="app">
+            <div class="app_note"></div>
+            <div class="loader"></div>
+            </div>
+            <style>
+            html, body, #app {
+                height: 100%;
+                width: 100%;
+                // overflow: hidden;
+                padding: 0;
+                margin: 0;
+            }
+
+            .loader {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                z-index: 1;
+                width: 150px;
+                height: 150px;
+                margin: -75px 0 0 -75px;
+                border: 16px solid #f3f3f3;
+                border-radius: 50%;
+                border-top: 16px solid #3498db;
+                width: 120px;
+                height: 120px;
+                -webkit-animation: spin 2s linear infinite;
+                animation: spin 2s linear infinite;
+              }
+              
+              @-webkit-keyframes spin {
+                0% { -webkit-transform: rotate(0deg); }
+                100% { -webkit-transform: rotate(360deg); }
+              }
+              
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+              
+              /* Add animation to "page content" */
+              .animate-bottom {
+                position: relative;
+                -webkit-animation-name: animatebottom;
+                -webkit-animation-duration: 1s;
+                animation-name: animatebottom;
+                animation-duration: 1s
+              }
+              
+              @-webkit-keyframes animatebottom {
+                from { bottom:-100px; opacity:0 } 
+                to { bottom:0px; opacity:1 }
+              }
+              
+              @keyframes animatebottom { 
+                from{ bottom:-100px; opacity:0 } 
+                to{ bottom:0; opacity:1 }
+              }
+
+            .app_note{
+                font-weight:500;
+                font-size:18px;
+                margin:10px;
+            }
+
+            #app{
+                display:flex;
+                flex-direction:column;
+            }
+            </style>
+            `;
+            document.querySelector('.app_note').innerHTML = `Note:- readmeta simulate meta tags for different application, 
+            but can not gurantee. 
+            It might be that some app has changed their rendering technique & readmeta is not updated.`
+            const meta = document.createElement("meta");
+            meta.name = "viewport";
+            meta.content = "width=device-width";
+            document.head.appendChild(meta);
+        })
         const pendingXHR = new PendingXHR(page)
         await page.goto(url);
         // await page.waitForNavigation({ waitUntil: "networkidle0" });
@@ -101,40 +183,7 @@ export const fetchMeta = async (url: string, shouldPreview) => {
         })
         await page.close();
         if (shouldPreview) {
-            page = (await browser.pages())[0];
-            await page.evaluate(() => {
-                document.body.innerHTML = `<div id="app">
-                <div class="app_note"></div>
-                </div>
-                <style>
-                html, body, #app {
-                    height: 100%;
-                    width: 100%;
-                    // overflow: hidden;
-                    padding: 0;
-                    margin: 0;
-                }
 
-                .app_note{
-                    font-weight:500;
-                    font-size:18px;
-                    margin:10px;
-                }
-
-                #app{
-                    display:flex;
-                    flex-direction:column;
-                }
-                </style>
-                `;
-                document.querySelector('.app_note').innerHTML = `Note:- readmeta simulate meta tags for different application, 
-                but can not gurantee. 
-                It might be that some app has changed their rendering technique & readmeta is not updated.`
-                const meta = document.createElement("meta");
-                meta.name = "viewport";
-                meta.content = "width=device-width";
-                document.head.appendChild(meta);
-            })
             const payloadForApp = {
                 changeImageSize: changeImageSize.toString(),
                 crop: crop.toString(),
@@ -142,9 +191,13 @@ export const fetchMeta = async (url: string, shouldPreview) => {
                 location
             };
             console.log("Rendering whatsapp\n");
-            await previewWhatsApp(page, payloadForApp);
+            await previewWhatsApp(firstPage, payloadForApp);
             console.log("Rendering facebook\n");
-            await previewfacebook(page, payloadForApp);
+            await previewfacebook(firstPage, payloadForApp);
+
+            await firstPage.evaluate(() => {
+                (document.querySelector('.loader') as HTMLDivElement).style.display = "none";
+            })
 
         }
         else {

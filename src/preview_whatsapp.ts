@@ -4,7 +4,6 @@ export function previewWhatsApp(page, options) {
             eval("changeImageSize = " + changeImageSize)
             eval("crop = " + crop);
             let imgUrl = og["og:image"];
-            debugger;
             imgUrl = Array.isArray(imgUrl) ? imgUrl[1] : imgUrl;
             if (imgUrl) {
                 if (imgUrl.indexOf("http") < 0) {
