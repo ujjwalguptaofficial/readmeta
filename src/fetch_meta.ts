@@ -17,14 +17,19 @@ export const fetchMeta = async (url: string, shouldPreview) => {
         url = prefix + url;
     }
     try {
-        const browser = await puppeteer.launch({
+        const previewBrowser = await puppeteer.launch({
             headless: !shouldPreview,
             // devtools: true,
             // args: ['--disable-infobars']
         });
-        let page = await browser.newPage();
-        const firstPage = (await browser.pages())[0];
-        firstPage.bringToFront();
+
+        const backGroundBrowser = await puppeteer.launch({
+            // headless: false,
+            // devtools: true,
+            // args: ['--disable-infobars']
+        });
+        let page = await backGroundBrowser.newPage();
+        const firstPage = (await previewBrowser.pages())[0];
         await firstPage.evaluate(() => {
             document.body.innerHTML = `<div id="app">
             <div class="app_note"></div>
@@ -181,7 +186,8 @@ export const fetchMeta = async (url: string, shouldPreview) => {
         const location = await page.evaluate(() => {
             return window.location;
         })
-        await page.close();
+        // await page.close();
+        backGroundBrowser.close();
         if (shouldPreview) {
 
             const payloadForApp = {
@@ -202,7 +208,7 @@ export const fetchMeta = async (url: string, shouldPreview) => {
         }
         else {
             printTag(result);
-            await browser.close();
+            await previewBrowser.close();
         }
 
     } catch (error) {
