@@ -2,9 +2,10 @@ import puppeteer from "puppeteer";
 const { PendingXHR } = require('pending-xhr-puppeteer');
 import { Spinner } from "cli-spinner";
 import { printTag } from "./print_tag";
-import { changeImageSize, crop } from "./change_img";
+import { changeImageSize } from "./change_img";
 import { previewWhatsApp } from "./preview_whatsapp";
 import { previewfacebook } from "./preview_fb";
+import { crop } from "./crop";
 
 
 export const fetchMeta = async (url: string, shouldPreview) => {
@@ -20,7 +21,7 @@ export const fetchMeta = async (url: string, shouldPreview) => {
         const previewBrowser = await puppeteer.launch({
             headless: !shouldPreview,
             // devtools: true,
-            // args: ['--disable-infobars']
+            args: ['--app=about:blank']
         });
 
         const backGroundBrowser = await puppeteer.launch({

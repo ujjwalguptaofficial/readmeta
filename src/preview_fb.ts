@@ -81,7 +81,7 @@ export function previewfacebook(page, options) {
             document.querySelector("#app").appendChild(facebook);
         } catch (error) {
             console.error(error);
-            window.alert(`Some error occured - ${error.message}`);
+            window.alert(`Some error occured, Check console for more info`);
         }
     }, options);
 }

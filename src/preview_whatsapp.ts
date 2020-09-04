@@ -77,7 +77,7 @@ export function previewWhatsApp(page, options) {
             document.querySelector("#app").appendChild(whatsapp);
         } catch (error) {
             console.error(error);
-            window.alert(`Some error occured - ${error.message}`);
+            window.alert(`Some error occured, Check console for more info`);
         }
     }, options);
 }
