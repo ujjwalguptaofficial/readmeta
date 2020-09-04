@@ -36,6 +36,9 @@ export const fetchMeta = async (url: string, shouldPreview) => {
             document.body.innerHTML = `<div id="app">
             <div class="app_note"></div>
             <div class="loader"></div>
+            <ul id="warning">
+
+            </ul>
             </div>
             <style>
             html, body, #app {
@@ -111,6 +114,16 @@ export const fetchMeta = async (url: string, shouldPreview) => {
             meta.name = "viewport";
             meta.content = "width=device-width";
             document.head.appendChild(meta);
+            const script = document.createElement("script");
+            script.appendChild(document.createTextNode(`
+                function addWarning(msg){
+                const li = document.createElement('li');
+                li.innerHTML=msg;
+                document.querySelector('#warning').appendChild(li);
+              }
+            `));
+            document.body.appendChild(script);
+
         })
         const pendingXHR = new PendingXHR(page)
         await page.goto(url);
