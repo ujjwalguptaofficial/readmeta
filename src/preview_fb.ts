@@ -15,7 +15,8 @@ export function previewfacebook(page, options) {
             const img = await changeImageSize(croppedImg, 540, 281);
             const facebook = document.createElement('div');
             facebook.innerHTML = `<h2>Facebook</h2>
-        <div class="facebook">
+            <p>Can also be previewed at official facebook tool - <a target="_blank" href="https://developers.facebook.com/tools/debug">https://developers.facebook.com/tools/debug</a></p>
+            <div class="facebook">
             <img class="facebook_image" src="${img}">
             <div class="facebook_text">
                 <div class="facebook_text_host">${location.host}</div>
@@ -31,7 +32,7 @@ export function previewfacebook(page, options) {
             border-right: 1px solid #dadde1;
             border-bottom: 1px solid #dadde1;
             width: fit-content;
-            margin-bottom: 50px;
+            margin: 50px;
         }
 
         .facebook_image{

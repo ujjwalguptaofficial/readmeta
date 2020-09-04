@@ -34,7 +34,8 @@ export function previewWhatsApp(page, options) {
             box-shadow: 0 1px .5px rgba(var(--shadow-rgb),.13);
             border-radius: 7.5px;
             border-top-right-radius: 0;
-            max-width: 95%;
+            max-width: 500px;
+            margin:50px;
         }
         .whatsapp_text{
             display:flex;

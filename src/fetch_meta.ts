@@ -6,6 +6,7 @@ import { changeImageSize } from "./change_img";
 import { previewWhatsApp } from "./preview_whatsapp";
 import { previewfacebook } from "./preview_fb";
 import { crop } from "./crop";
+import { previewTwitter } from "./preview_twitter";
 
 
 export const fetchMeta = async (url: string, shouldPreview) => {
@@ -201,6 +202,13 @@ export const fetchMeta = async (url: string, shouldPreview) => {
             await previewWhatsApp(firstPage, payloadForApp);
             console.log("Rendering facebook\n");
             await previewfacebook(firstPage, payloadForApp);
+            console.log("Rendering twitter\n");
+            await previewTwitter(firstPage, {
+                changeImageSize: changeImageSize.toString(),
+                crop: crop.toString(),
+                tag: result.twitter,
+                location
+            });
 
             await firstPage.evaluate(() => {
                 (document.querySelector('.loader') as HTMLDivElement).style.display = "none";
