@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :readmeta - V1.1.1 - 03/09/2020
+ * @license :readmeta - V1.1.2 - 04/09/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */
@@ -96,13 +96,12 @@
 /*!***************************!*\
   !*** ./src/change_img.ts ***!
   \***************************/
-/*! exports provided: changeImageSize, crop */
+/*! exports provided: changeImageSize */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "changeImageSize", function() { return changeImageSize; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return crop; });
 // import { getImgExtensionFromUrl } from "./get_extension_from_url";
 const changeImageSize = async function (dataUrl, width, height, quality = 1 // e.g. 0.9 = 90% quality
 ) {
@@ -112,19 +111,13 @@ const changeImageSize = async function (dataUrl, width, height, quality = 1 // e
     };
     function getImage(dataUrl) {
         return new Promise((resolve, reject) => {
-            // add current data for caching issue
-            // if (dataUrl.includes('http')) {
-            //     dataUrl = addParameterToURL(dataUrl, 'cors', Date.now());
-            // }
             const image = new Image();
             image.src = dataUrl;
             image.crossOrigin = "true";
             image.onload = () => {
                 resolve(image);
             };
-            // image.onerror = (el: any, err: ErrorEvent) => {
-            //     reject(err.error);
-            // };
+            image.onerror = reject;
         });
     }
     // Create a temporary image so that we can compute the height of the image.
@@ -140,9 +133,27 @@ const changeImageSize = async function (dataUrl, width, height, quality = 1 // e
     const newDataUrl = canvas.toDataURL(imageType, quality);
     return newDataUrl;
 };
+
+
+/***/ }),
+
+/***/ "./src/crop.ts":
+/*!*********************!*\
+  !*** ./src/crop.ts ***!
+  \*********************/
+/*! exports provided: crop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return crop; });
 const crop = function (url, aspectRatio) {
+    const getImgExtensionFromUrl = (url) => {
+        const extension = ["jpg", "jpeg", "png", "svg", "webp"];
+        return extension.find(q => url.includes(q));
+    };
     // we return a Promise that gets resolved with our canvas element
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         // this image will hold our source image data
         const inputImage = new Image();
         inputImage.crossOrigin = "true";
@@ -174,9 +185,11 @@ const crop = function (url, aspectRatio) {
             const ctx = outputImage.getContext('2d');
             ctx.drawImage(inputImage, outputX, outputY);
             // document.body.appendChild(outputImage);
+            const imageType = `image/${getImgExtensionFromUrl(url)}`;
             // resolve(outputImage);
-            resolve(outputImage.toDataURL("image/png"));
+            resolve(outputImage.toDataURL(imageType));
         };
+        inputImage.onerror = reject;
         // start loading our image
         inputImage.src = url;
     });
@@ -203,8 +216,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _change_img__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./change_img */ "./src/change_img.ts");
 /* harmony import */ var _preview_whatsapp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./preview_whatsapp */ "./src/preview_whatsapp.ts");
 /* harmony import */ var _preview_fb__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./preview_fb */ "./src/preview_fb.ts");
+/* harmony import */ var _crop__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./crop */ "./src/crop.ts");
 
 const { PendingXHR } = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer");
+
 
 
 
@@ -222,6 +237,8 @@ const fetchMeta = async (url, shouldPreview) => {
     try {
         const previewBrowser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
             headless: !shouldPreview,
+            // devtools: true,
+            args: ['--app=about:blank']
         });
         const backGroundBrowser = await puppeteer__WEBPACK_IMPORTED_MODULE_0___default.a.launch({
         // headless: false,
@@ -385,7 +402,7 @@ const fetchMeta = async (url, shouldPreview) => {
         if (shouldPreview) {
             const payloadForApp = {
                 changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["changeImageSize"].toString(),
-                crop: _change_img__WEBPACK_IMPORTED_MODULE_3__["crop"].toString(),
+                crop: _crop__WEBPACK_IMPORTED_MODULE_6__["crop"].toString(),
                 og: result.facebook,
                 location
             };
@@ -578,7 +595,7 @@ function previewfacebook(page, options) {
         }
         catch (error) {
             console.error(error);
-            window.alert(`Some error occured - ${error.message}`);
+            window.alert(`Some error occured, Check console for more info`);
         }
     }, options);
 }
@@ -676,7 +693,7 @@ function previewWhatsApp(page, options) {
         }
         catch (error) {
             console.error(error);
-            window.alert(`Some error occured - ${error.message}`);
+            window.alert(`Some error occured, Check console for more info`);
         }
     }, options);
 }
