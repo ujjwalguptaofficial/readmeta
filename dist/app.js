@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * @license :readmeta - V1.1.2 - 04/09/2020
+ * @license :readmeta - V1.2.0 - 04/09/2020
  * https://github.com/ujjwalguptaofficial/getmeta
  * Copyright (c) 2020 @Ujjwal Gupta; Licensed MIT
  */
@@ -217,8 +217,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _preview_whatsapp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./preview_whatsapp */ "./src/preview_whatsapp.ts");
 /* harmony import */ var _preview_fb__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./preview_fb */ "./src/preview_fb.ts");
 /* harmony import */ var _crop__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./crop */ "./src/crop.ts");
+/* harmony import */ var _preview_twitter__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./preview_twitter */ "./src/preview_twitter.ts");
 
 const { PendingXHR } = __webpack_require__(/*! pending-xhr-puppeteer */ "pending-xhr-puppeteer");
+
 
 
 
@@ -251,6 +253,9 @@ const fetchMeta = async (url, shouldPreview) => {
             document.body.innerHTML = `<div id="app">
             <div class="app_note"></div>
             <div class="loader"></div>
+            <ul id="warning">
+
+            </ul>
             </div>
             <style>
             html, body, #app {
@@ -326,6 +331,15 @@ const fetchMeta = async (url, shouldPreview) => {
             meta.name = "viewport";
             meta.content = "width=device-width";
             document.head.appendChild(meta);
+            const script = document.createElement("script");
+            script.appendChild(document.createTextNode(`
+                function addWarning(msg){
+                const li = document.createElement('li');
+                li.innerHTML=msg;
+                document.querySelector('#warning').appendChild(li);
+              }
+            `));
+            document.body.appendChild(script);
         });
         const pendingXHR = new PendingXHR(page);
         await page.goto(url);
@@ -410,6 +424,13 @@ const fetchMeta = async (url, shouldPreview) => {
             await Object(_preview_whatsapp__WEBPACK_IMPORTED_MODULE_4__["previewWhatsApp"])(firstPage, payloadForApp);
             console.log("Rendering facebook\n");
             await Object(_preview_fb__WEBPACK_IMPORTED_MODULE_5__["previewfacebook"])(firstPage, payloadForApp);
+            console.log("Rendering twitter\n");
+            await Object(_preview_twitter__WEBPACK_IMPORTED_MODULE_7__["previewTwitter"])(firstPage, {
+                changeImageSize: _change_img__WEBPACK_IMPORTED_MODULE_3__["changeImageSize"].toString(),
+                crop: _crop__WEBPACK_IMPORTED_MODULE_6__["crop"].toString(),
+                tag: result.twitter,
+                location
+            });
             await firstPage.evaluate(() => {
                 document.querySelector('.loader').style.display = "none";
             });
@@ -528,7 +549,8 @@ function previewfacebook(page, options) {
             const img = await changeImageSize(croppedImg, 540, 281);
             const facebook = document.createElement('div');
             facebook.innerHTML = `<h2>Facebook</h2>
-        <div class="facebook">
+            <p>Can also be previewed at official facebook tool - <a target="_blank" href="https://developers.facebook.com/tools/debug">https://developers.facebook.com/tools/debug</a></p>
+            <div class="facebook">
             <img class="facebook_image" src="${img}">
             <div class="facebook_text">
                 <div class="facebook_text_host">${location.host}</div>
@@ -544,7 +566,7 @@ function previewfacebook(page, options) {
             border-right: 1px solid #dadde1;
             border-bottom: 1px solid #dadde1;
             width: fit-content;
-            margin-bottom: 50px;
+            margin: 50px;
         }
 
         .facebook_image{
@@ -603,6 +625,230 @@ function previewfacebook(page, options) {
 
 /***/ }),
 
+/***/ "./src/preview_twitter.ts":
+/*!********************************!*\
+  !*** ./src/preview_twitter.ts ***!
+  \********************************/
+/*! exports provided: previewTwitter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "previewTwitter", function() { return previewTwitter; });
+function previewTwitter(page, options) {
+    return page.evaluate(async ({ tag, changeImageSize, crop, location }) => {
+        try {
+            eval("changeImageSize = " + changeImageSize);
+            eval("crop = " + crop);
+            const twitterCard = tag["twitter:card"];
+            let imgUrl = tag["twitter:image"];
+            if (imgUrl) {
+                if (imgUrl.indexOf("http") < 0) {
+                    imgUrl = location.origin + imgUrl;
+                }
+                else {
+                    const url = new URL(imgUrl);
+                    if (url.protocol != location.protocol) {
+                        window["addWarning"](`<span>&#9888;</span> twitter image url protocol is ${url.protocol} while your web app protocol is ${location.protocol}. This might cause not rendering your preview image.`);
+                        url.protocol = location.protocol;
+                        imgUrl = url.href;
+                    }
+                }
+            }
+            let img;
+            const twitter = document.createElement('div');
+            let html;
+            if (twitterCard === 'summary_large_image') {
+                const croppedImg = await crop(imgUrl, 2 / 1);
+                img = await changeImageSize(croppedImg, 600, 314);
+                html = `<div class="twitter">
+                            <div class="twitter_image_wrapper">
+                                <img class="twitter_image" src="${img}">
+                            </div>
+                            <div class="twitter_text">
+                                <div class="twitter_text_title">${tag["twitter:title"]}</div>
+                                <div class="twitter_text_desc">${tag["twitter:description"]}</div>
+                                <div class="twitter_text_host">${location.host}</div>
+                            </div>
+                        </div>
+                    <style>
+                    .twitter{
+                        display:flex;
+                        flex-direction:column;
+                        width: fit-content;
+                        margin: 50px;
+            
+                        border-radius: .85714em;
+                        border-width: 1px;
+                        border-style: solid;
+                        border-color: #E1E8ED;
+                        box-sizing: border-box;
+                        color: inherit!important;
+                        max-width: 800px;
+                        overflow: hidden;
+                    }
+            
+                    .twitter_image{
+                        width: 100%;
+                        height: 100%;
+                    }
+            
+                    .twitter_image_wrapper{
+                        width: 438px;
+                        height: 220px;
+                        border-bottom-width: 1px;
+                        border-bottom-width: 1px;
+                        border-color: inherit;
+                        border-bottom-style: solid;
+                    }
+            
+                    .twitter_text{
+                        display:flex;
+                        flex-direction:column;
+                        padding-left: 1em;
+                        padding-right: 1em;
+            
+                        padding: .75em;
+                        box-sizing: border-box;
+                        text-decoration: none;
+            
+                        font-size: 14px;
+                        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                        line-height: 1.3em;
+                        width:436px;
+                    }
+            
+                    .twitter_text_host{
+                        text-transform: lowercase;
+                        color: #8899A6;
+                        max-height: 1.3em;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        margin-top: .32333em;
+                    }
+            
+                    .twitter_text_title{
+                        max-height: 1.3em;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        font-size: 1em;
+                        margin: 0 0 .15em;
+                        font-weight:700;
+                    }
+            
+                    .twitter_text_desc{
+                        max-height: 2.6em;
+                        overflow: hidden;
+                        margin-top: .32333em;
+                    }
+                    
+                    </style>
+                `;
+            }
+            else {
+                const croppedImg = await crop(imgUrl, 1 / 1);
+                img = await changeImageSize(croppedImg, 144, 144);
+                html = `<div class="twitter">
+                            <div class="twitter_image_wrapper">
+                                <img class="twitter_image" src="${img}">
+                            </div>
+                            <div class="twitter_text">
+                                <div class="twitter_text_title">${tag["twitter:title"]}</div>
+                                <div class="twitter_text_desc">${tag["twitter:description"]}</div>
+                                <div class="twitter_text_host">${location.host}</div>
+                            </div>
+                        </div>
+                    <style>
+                    .twitter{
+                        display:flex;
+                        flex-direction:row;
+                        width: 438px;
+                        margin: 50px;
+            
+                        border-radius: .85714em;
+                        border-width: 1px;
+                        border-style: solid;
+                        border-color: #E1E8ED;
+                        box-sizing: border-box;
+                        color: inherit!important;
+                        max-width: 800px;
+                        overflow: hidden;
+                        height:125px;
+                    }
+            
+                    .twitter_image{
+                        width: 100%;
+                        height: 100%;
+                    }
+            
+                    .twitter_image_wrapper{
+                        width: 8.81667em;
+                        border-right-width: 1px;
+                        border-bottom-width: 1px;
+                        border-bottom-width: 1px;
+                        border-color: inherit;
+                        border-bottom-style: solid;
+                    }
+            
+                    .twitter_text{
+                        display:flex;
+                        flex-direction:column;
+                        padding: .75em;
+                        box-sizing: border-box;
+                        text-decoration: none;
+            
+                        font-size: 14px;
+                        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                        line-height: 1.3em;
+                        width:calc(100% - 8.81667em - 2px);
+                    }
+            
+                    .twitter_text_host{
+                        text-transform: lowercase;
+                        color: #8899A6;
+                        max-height: 1.3em;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        margin-top: .32333em;
+                    }
+            
+                    .twitter_text_title{
+                        max-height: 1.3em;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        font-size: 1em;
+                        margin: 0 0 .15em;
+                        font-weight:700;
+                    }
+            
+                    .twitter_text_desc{
+                        max-height: 3.9em;
+                        overflow: hidden;
+                        margin-top: .32333em;
+                    }
+                    
+                    </style>
+                `;
+            }
+            twitter.innerHTML = `<h2>Twitter</h2>
+            <p>Can also be previewed at official twitter tool - <a target="_blank" href="https://cards-dev.twitter.com/validator">https://cards-dev.twitter.com/validator</a></p>`
+                + html;
+            document.querySelector("#app").appendChild(twitter);
+        }
+        catch (error) {
+            console.error(error);
+            window.alert(`Some error occured, Check console for more info`);
+        }
+    }, options);
+}
+
+
+/***/ }),
+
 /***/ "./src/preview_whatsapp.ts":
 /*!*********************************!*\
   !*** ./src/preview_whatsapp.ts ***!
@@ -649,7 +895,8 @@ function previewWhatsApp(page, options) {
             box-shadow: 0 1px .5px rgba(var(--shadow-rgb),.13);
             border-radius: 7.5px;
             border-top-right-radius: 0;
-            max-width: 95%;
+            max-width: 500px;
+            margin:50px;
         }
         .whatsapp_text{
             display:flex;
